@@ -1,4 +1,4 @@
-# DDD Go Template - Very Simple version
+# Ports & Adapters Go Template - Very Simple version
 
 This project was created to illustrate an interesting directory structure
 I developed together with [@fabiorodrigues](https://github.com/fabiorodrigues) in the period I was working
@@ -7,15 +7,16 @@ for [Dito](https://dito.com.br), they both deserve as much credit as me here.
 This very powerful, but yet flat and simple template is organized in 3 directories:
 
 - **cmd/:** Each subdirectory is an entry point for the project,
-  e.g. a worker, an API or a CLI. Each of these packages
+  e.g. a worker, an API or a CLI. Also known as the presentation layer or
+  just as driver adapters. Each of these packages
   is responsible for decoding the configurations, performing the
   dependency injection and setting up any Frameworks if necessary
   (in our case we are using the Fiber as our HTTP framework).
 
-- **domain/:** This package contains the domain language, which is the minimum
-  shared language that all packages are allowed to import. Thus, this package is
-  meant to be imported by all other packages in order to allow decoupled
-  communication between them.
+- **domain/:** This package contains the types that represent the domain language,
+  which is the minimum shared language that all packages are allowed to import.
+  Thus, this package is meant to be imported by all other packages in order to
+  allow decoupled communication between them.
 
   Each subpackage of the domain pkg is a Service, and this is where we
   should concentrate the domain logic.
@@ -30,13 +31,17 @@ This very powerful, but yet flat and simple template is organized in 3 directori
   These infra packages are meant to contain any logic that is unrelated
   to your domain in order to move as much code as possible away from your services.
 
-  One other thing that we keep here are the repositories, which are often the only
+  One other thing that we keep here are the repository implementations, which are often the only
   infra packages that actually use the entities directly, although this is not prohibited
-  by DDD.
+  by DDD try to avoid adding domain logic to the repositories except when
+  required for performance reasons.
 
   The idea here is that the Services contain the most complex and important parts of the project,
   thus, by moving any logic that is not related to the domain away from the Services we can
   keep the Services as simple as they can possibly be, which makes the code a lot easier to maintain.
+  At the same time we try to move as much domain logic away from the infra packages so that
+  if we replace one infra technology for another we don't have to reimplement commong logic that
+  relates to the domain and not to the adapter.
 
 For Portuguese readers we have a more descriptive explanation of this architecture here:
 

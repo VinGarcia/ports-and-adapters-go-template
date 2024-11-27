@@ -1,16 +1,12 @@
-# DDD Go Template - Domain Adapters and Helpers
+# Ports & Adapters Go Template - Domain Adapters and Helpers
 
 If you haven't read yet, I recommend reading the `v1-very-simple/README.md` first.
 
-This template as the other one is based on the same concepts, except this one
-is taking advantage of how similar this architecture is to the Ports & Adapters architecture
-and making use of some good descriptive names from that context.
+This template divides the code in an equivalent way to the `v1-very-simple` one, except this one
+is slightly more ergonomic by that I mean:
 
-That said it is useful to start learning from the simplest version first before reading
-this one.
-
-This example template has the same logical structure as the `v1-very-simple` version,
-but organizes the interfaces and DTOs in a way that allows better names, such as:
+It moves the domain interfaces (ports) to packages closer to the adapters that implement them
+which allows for better names, such as:
 
 - `rest.Provider` instead of `domain.RestProvider`
 - `cache.Provider` instead of `domain.CacheProvider`
@@ -23,18 +19,25 @@ we actually split the infra directory into 2 new directories:
 - `helpers/`
 
 This is an important distinction because helpers are meant to be very simple
-pieces of code that simplify a few common use-cases, and we usually don't mind
-depending directly on them, exactly because they are very simple and because
-they exist inside on the same version control of our code, so we can safely
-update them if necessary.
+pieces of code that don't depend on the domain and also don't depend on
+specific external technologies, except maybe helper libraries like testify
+that are also similarly decoupled from technologies other than the stdlib.
 
-But the same is not valid for adapters, so having this separation expressed
-on the directory structure is kind of important.
+But the same is not valid for adapters: they can both see the domain types
+and also depend on external technologies such as databases, queues, email providers
+and so on.
+
+> Note: Not all adapters need to depend on domain types, and we could create
+> a third directory to differentiate between the adapters that do, we
+> could call them repositories, and the ones that don't. But in terms
+> of logical decoupling rules that benefit the code maintainability
+> this distinction is unimportant: all adapters are here to serve
+> the needs of your domain as specified by the ports (domain interfaces).
 
 ## Reorganizing the infra package
 
-For that we reorganized all adapters in the `infra/` package by nesting
-them inside a package that contains the interface they implement, e.g.:
+The `infra/` packages still exist in this repo but they are organized
+differently, we now have one upper directory for each interface implementation:
 
 - The `infra/http` package was moved to `adapters/rest/http`
 - The `infra/memorycache` package was moved to `adapters/cache/memorycache`
@@ -49,7 +52,9 @@ only the relevant interfaces for that dependency, so now we have 3 new files wit
 - `adapters/cache/contracts.go`
 - `adapters/cache/contracts.go`
 
-And the old `domain/contracts.go` was deleted.
+And the old `domain/contracts.go` was deleted, although in some situations
+where an interface is implemented by a service or by more than one adapter
+it would be ok to keep it on `domain/contracts.go`.
 
 We also moved the two helpers that we used to have inside the infra package
 to the helpers directory:
